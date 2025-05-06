@@ -6,16 +6,21 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "vite",
-    "dev:backend": "nodemon --watch 'api/trpc' --exec 'tsx' api/trpc/index.ts",
+    "dev:backend": "nodemon --watch 'server/*' --exec 'tsx' server/index.ts",
     "build": "tsc -b tsconfig.api.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.75.4",
+    "@trpc/client": "^11.1.2",
+    "@trpc/server": "^11.1.2",
+    "@trpc/tanstack-react-query": "^11.1.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
