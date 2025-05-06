@@ -1,4 +1,4 @@
-# Quick Attack Pack
+# Welcome to The Quick Attack Pack
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
