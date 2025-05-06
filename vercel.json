@@ -3,7 +3,11 @@
   "builds": [
     {
       "src": "api/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["api/**/*"],
+        "buildCommand": "tsc -b tsconfig.api.json"
+      }
     },
     {
       "src": "package.json",

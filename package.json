@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "vite",
     "dev:backend": "nodemon --watch 'api/trpc' --exec 'tsx' api/trpc/index.ts",
-    "build": "tsc -b && vite build && tsc -b tsconfig.api.json",
+    "build": "tsc -b tsconfig.api.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
