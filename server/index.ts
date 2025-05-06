@@ -1,15 +1,15 @@
-import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import express from 'express';
-import cors from 'cors';
-import { publicProcedure, router, createContext } from './trpc';
-import { z } from 'zod';
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import express from "express";
+import cors from "cors";
+import { publicProcedure, router, createContext } from "./trpc";
+import { z } from "zod";
 
 export const appRouter = router({
   greeting: publicProcedure
     .input(z.object({ name: z.string() }))
-    .query(opts => {
+    .query((opts) => {
       const { input } = opts;
-      return `Hello ${input.name}` as const;
+      return `Welcome back, ${input.name}` as const;
     }),
 });
 
@@ -19,11 +19,11 @@ app.use(cors());
 app.use(express.json());
 
 app.use(
-  '/trpc',
+  "/trpc",
   createExpressMiddleware({
     router: appRouter,
     createContext,
-  })
+  }),
 );
 
 const PORT = process.env.PORT || 3000;

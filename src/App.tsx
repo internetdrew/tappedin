@@ -1,15 +1,19 @@
-import './App.css';
-import { trpc } from '../utils/trpc';
-import { useQuery } from '@tanstack/react-query';
+import { trpc } from "../utils/trpc";
+import { useQuery } from "@tanstack/react-query";
 
 function App() {
   const { data, isLoading } = useQuery(
-    trpc.greeting.queryOptions({ name: 'John' })
+    trpc.greeting.queryOptions({ name: "InternetDrew" }),
   );
 
-  if (isLoading) return <div>Loading...</div>;
-
-  return <h1>{data}</h1>;
+  return (
+    <div className="flex h-screen flex-col items-center justify-center">
+      <h1 className="text-lg font-semibold">
+        {isLoading ? "Loading..." : data}
+      </h1>
+      <p className="font-mono text-sm">We're all set up to build something!</p>
+    </div>
+  );
 }
 
 export default App;
