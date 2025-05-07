@@ -9,15 +9,14 @@ LyteStack is a starter pack to create an SPA quickly and deploy to Vercel. If yo
 ## Table of Contents
 
 - [What's Here?](#whats-here)
+- [What's in the Stack?](#whats-in-the-stack)
 - [Get Started](#get-started)
-- [Development](#development)
-- [Deployment](#deployment)
 - [Usage and Structure](#usage-and-structure)
-  - [Notes on Deployment](#notes-on-deployment)
-  - [Notes on Development Server](#notes-on-development-server)
+  - [Development](#development)
+  - [Deployment](#deployment)
   - [Notes on Middleware](#notes-on-middleware)
 
-## What's Here?
+## What's in the Stack?
 
 - [Vite-based React](https://vite.dev/guide/) with...
   - [TypeScript](https://www.typescriptlang.org/) and
@@ -59,18 +58,42 @@ LyteStack is a starter pack to create an SPA quickly and deploy to Vercel. If yo
    npm run build
    ```
 
-## Development
-
-- Client runs on `http://localhost:5173`
-- Server runs on `http://localhost:3000`
-
-## Deployment
-
-This stack is optimized for deployment on Vercel. Simply connect your repository to Vercel and it will automatically detect the build settings.
-
 ## Usage and Structure
 
-### Notes on Deployment
+### Development
+
+The development environment uses Vite's dev server with a proxy configuration to seamlessly connect the frontend and backend:
+
+1. **Vite Dev Server**:
+
+   - Runs on `http://localhost:5173`
+   - Handles hot module replacement (HMR) for React components
+   - Serves static assets and handles client-side routing
+
+2. **Express Server**:
+
+   - Runs on `http://localhost:3000`
+   - Handles tRPC API requests
+   - Manages server-side logic and database connections
+
+3. **Proxy Configuration**:
+   The connection between Vite and Express is handled through Vite's proxy configuration in `vite.config.ts`:
+   ```typescript
+   {
+     proxy: {
+       '/trpc': {
+         target: 'http://localhost:3000',
+         changeOrigin: true,
+       }
+     }
+   }
+   ```
+   This configuration:
+   - Forwards all `/trpc/*` requests to the Express server
+   - Enables seamless API calls during development (nodemon watches server files)
+   - Maintains type safety through tRPC
+
+### Deployment
 
 - The key difference between making this work locally and making it work in deployment is the `vercel.json` file in the root directory. This configuration file tells Vercel how to build and serve your application:
 
@@ -105,39 +128,6 @@ Here's what each part does:
 2. **Rewrites Configuration**:
    - `/trpc/:path*`: Routes all tRPC API requests to the server
    - `/(.*)`: Routes all other requests to `index.html` for client-side routing
-
-### Notes on Development Server
-
-The development environment uses Vite's dev server with a proxy configuration to seamlessly connect the frontend and backend:
-
-1. **Vite Dev Server**:
-
-   - Runs on `http://localhost:5173`
-   - Handles hot module replacement (HMR) for React components
-   - Serves static assets and handles client-side routing
-
-2. **Express Server**:
-
-   - Runs on `http://localhost:3000`
-   - Handles tRPC API requests
-   - Manages server-side logic and database connections
-
-3. **Proxy Configuration**:
-   The connection between Vite and Express is handled through Vite's proxy configuration in `vite.config.ts`:
-   ```typescript
-   {
-     proxy: {
-       '/trpc': {
-         target: 'http://localhost:3000',
-         changeOrigin: true,
-       }
-     }
-   }
-   ```
-   This configuration:
-   - Forwards all `/trpc/*` requests to the Express server
-   - Enables seamless API calls during development (nodemon watches server files)
-   - Maintains type safety through tRPC
 
 ### Notes on Middleware
 
