@@ -3,6 +3,10 @@ import express from "express";
 import cors from "cors";
 import { publicProcedure, router, createContext } from "./trpc";
 import { z } from "zod";
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 export const appRouter = router({
   greeting: publicProcedure
@@ -17,7 +21,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://react-express-trpc-shad.vercel.app",
+    origin: process.env.VERCEL_URL || "http://localhost:5173",
   }),
 );
 app.use(express.json());
