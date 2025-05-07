@@ -17,7 +17,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://react-express-trpc-shad.vercel.app",
   }),
 );
 app.use(express.json());
