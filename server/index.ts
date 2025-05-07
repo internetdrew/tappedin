@@ -5,26 +5,30 @@ import { publicProcedure, router, createContext } from "./trpc";
 import { z } from "zod";
 import dotenv from "dotenv";
 import path from "path";
+import compression from "compression";
+import helmet from "helmet";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 export const appRouter = router({
   greeting: publicProcedure
-    .input(z.object({ name: z.string() }))
+    .input(z.object({ intro: z.string() }))
     .query((opts) => {
       const { input } = opts;
-      return `Welcome back, ${input.name}` as const;
+      return `${input.intro} LyteStack` as const;
     }),
 });
 
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+};
+
 const app = express();
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  }),
-);
+app.use(compression());
+app.use(helmet());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use(
