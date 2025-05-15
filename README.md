@@ -1,10 +1,11 @@
-# Welcome to LyteStack
+# Deploy React, Express, and tRPC on Vercel
 
 <div align="center">
   <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXVvZXFidzJtbzRoZ291MGRzZHFpdHM2MzQ1aXR4NmdiYmtkcDdpMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2UndXEgN5iBwc/giphy.gif" width="100%" alt="animated cassette spinning in radio">
 </div>
 <br/>
-LyteStack is a starter pack to create an SPA quickly and deploy to Vercel. If you want something fun, light, and fast with a type-safe API, you've arrived.
+
+Use this starter pack to create an SPA quickly and deploy to Vercel. If you want something fun, light, and fast with a type-safe API, you've arrived.
 
 ## Table of Contents
 
