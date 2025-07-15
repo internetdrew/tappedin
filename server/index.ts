@@ -11,6 +11,19 @@ import helmet from "helmet";
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 export const appRouter = router({
+  generatePosts: publicProcedure
+    .input(
+      z.object({
+        content: z.string(),
+        tone: z.string(),
+        platforms: z.array(z.string()),
+        callToAction: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { content, tone, platforms, callToAction } = input;
+      return { content, tone, platforms, callToAction };
+    }),
   greeting: publicProcedure
     .input(z.object({ intro: z.string() }))
     .query((opts) => {
