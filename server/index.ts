@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import path from "path";
 import compression from "compression";
 import helmet from "helmet";
+import { generatePosts } from "./generatePosts";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -22,7 +23,13 @@ export const appRouter = router({
     )
     .mutation(async ({ input }) => {
       const { content, tone, platforms, callToAction } = input;
-      return { content, tone, platforms, callToAction };
+      const posts = await generatePosts({
+        content,
+        tone,
+        platforms,
+        callToAction,
+      });
+      return posts;
     }),
   greeting: publicProcedure
     .input(z.object({ intro: z.string() }))
