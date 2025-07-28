@@ -2,14 +2,12 @@
 // import { useQuery } from "@tanstack/react-query";
 import {
   AudioLines,
-  Briefcase,
   LayoutGrid,
-  LightbulbIcon,
   RocketIcon,
-  ScrollTextIcon,
   Sparkle,
+  ScrollTextIcon,
   Users,
-  Zap,
+  UserCheck,
 } from "lucide-react";
 import { ThemeProvider } from "./components/theme-provider";
 import {
@@ -25,7 +23,6 @@ import { Label } from "./components/ui/label";
 import { Checkbox } from "./components/ui/checkbox";
 import { Badge } from "./components/ui/badge";
 import { Input } from "./components/ui/input";
-import { Button } from "./components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -38,46 +35,20 @@ import {
 } from "./components/ui/form";
 import { trpc } from "../utils/trpc";
 import { useMutation } from "@tanstack/react-query";
-
-const toneOptions = [
-  {
-    label: "Professional",
-    description: "Formal, authoritative tone for business content",
-    icon: Briefcase,
-    value: "professional",
-    color: "text-blue-600",
-  },
-  {
-    label: "Conversational",
-    description: "Friendly, approachable tone for engagement",
-    icon: Users,
-    value: "conversational",
-    color: "text-green-600",
-  },
-  {
-    label: "Energetic",
-    description: "Enthusiastic, motivational tone",
-    icon: Zap,
-    value: "energetic",
-    color: "text-orange-600",
-  },
-  {
-    label: "Thoughtful",
-    description: "Reflective, insightful tone for deeper content",
-    icon: LightbulbIcon,
-    value: "thoughtful",
-    color: "text-purple-600",
-  },
-];
+import PreviewCard from "./components/PreviewCard";
+import { audienceOptions, posterTypeOptions, toneOptions } from "./constants";
+import { Button } from "./components/ui/button";
 
 const formSchema = z.object({
   content: z.string().min(1, "Content is required"),
   tone: z.string().min(1, "Please select a tone"),
   platforms: z.array(z.string()).min(1, "Please select at least one platform"),
+  posterType: z.string().min(1, "Please select a poster type"),
+  audience: z.string().min(1, "Please select an audience"),
   callToAction: z.string().optional(),
 });
 
-type FormData = z.infer<typeof formSchema>;
+export type FormData = z.infer<typeof formSchema>;
 
 function App() {
   const form = useForm<FormData>({
@@ -86,6 +57,8 @@ function App() {
       content: "",
       tone: "",
       platforms: [],
+      posterType: "",
+      audience: "",
       callToAction: "",
     },
   });
@@ -93,11 +66,13 @@ function App() {
   const mutation = useMutation(trpc.generatePosts.mutationOptions());
 
   const onSubmit = async (data: FormData) => {
-    const result = await mutation.mutateAsync(
+    await mutation.mutateAsync(
       {
         content: data.content,
         tone: data.tone,
         platforms: data.platforms,
+        poster: data.posterType,
+        audience: data.audience,
         callToAction: data.callToAction || "",
       },
       {
@@ -109,7 +84,6 @@ function App() {
         },
       },
     );
-    console.log("Result:", result);
   };
 
   return (
@@ -214,6 +188,113 @@ function App() {
                   />
                 </CardContent>
               </Card>
+              {/* Poster Type */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <UserCheck className="mr-1 inline size-4 text-pink-600" />
+                    Poster Type
+                  </CardTitle>
+                  <CardDescription>
+                    Select a role to personalize the content style.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="posterType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <RadioGroup
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            {posterTypeOptions.map((option) => (
+                              <Label
+                                htmlFor={option.id}
+                                key={option.id}
+                                className="flex w-full cursor-pointer items-center rounded-md p-4 ring-1 ring-neutral-500/50 hover:bg-neutral-900"
+                              >
+                                <option.icon
+                                  className={`mr-2 size-6 ${option.color}`}
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-lg">{option.name}</span>
+                                  <span className="text-muted-foreground text-sm">
+                                    {option.description}
+                                  </span>
+                                </div>
+                                <RadioGroupItem
+                                  value={option.id}
+                                  id={option.id}
+                                  className="ml-auto text-blue-600"
+                                />
+                              </Label>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+              {/* Audience */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <Users className="mr-1 inline size-4 text-pink-600" />
+                    Audience
+                  </CardTitle>
+                  <CardDescription>
+                    Choose who you want to reach with your content.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="audience"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <RadioGroup
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            {audienceOptions.map((option) => (
+                              <Label
+                                htmlFor={option.id}
+                                key={option.id}
+                                className="flex w-full cursor-pointer items-center rounded-md p-4 ring-1 ring-neutral-500/50 hover:bg-neutral-900"
+                              >
+                                <option.icon
+                                  className={`mr-2 size-6 ${option.color}`}
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-lg">{option.name}</span>
+                                  <span className="text-muted-foreground text-sm">
+                                    {option.description}
+                                  </span>
+                                </div>
+                                <RadioGroupItem
+                                  value={option.id}
+                                  id={option.id}
+                                  className="ml-auto text-blue-600"
+                                />
+                              </Label>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+              {/* Platforms */}
               <Card>
                 <CardHeader>
                   <CardTitle>
@@ -323,134 +404,36 @@ function App() {
                   />
                 </CardContent>
               </Card>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={
-                  !form.watch("content").trim() ||
-                  !form.watch("tone") ||
-                  form.watch("platforms").length === 0
-                }
-              >
-                <Sparkle className="size-4" />
-                Generate
-              </Button>
             </form>
           </Form>
-          <div>
-            <Card className="sticky top-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-1">
-                  <span className="inline-block h-2 w-2 rounded-full bg-pink-600"></span>
-                  Preview
-                </CardTitle>
-                <CardDescription>
-                  Here's the criteria we'll use to generate your posts.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-block h-2 w-2 rounded-full ${
-                      form.watch("content").trim().length > 0
-                        ? "bg-pink-600"
-                        : "bg-neutral-600"
-                    }`}
-                  ></span>
-                  <span
-                    className={`${
-                      form.watch("content").trim().length > 0
-                        ? "text-pink-600"
-                        : "text-neutral-600"
-                    }`}
-                  >
-                    Content added
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-block h-2 w-2 rounded-full ${
-                      form.watch("tone") ? "bg-pink-600" : "bg-neutral-600"
-                    }`}
-                  ></span>
-                  <span
-                    className={`${
-                      form.watch("tone") ? "text-pink-600" : "text-neutral-600"
-                    }`}
-                  >
-                    Tone selected
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-block h-2 w-2 rounded-full ${
-                      form.watch("platforms").length > 0
-                        ? "bg-pink-600"
-                        : "bg-neutral-600"
-                    }`}
-                  ></span>
-                  <span
-                    className={`${
-                      form.watch("platforms").length > 0
-                        ? "text-pink-600"
-                        : "text-neutral-600"
-                    }`}
-                  >
-                    Platform(s) chosen
-                  </span>
-                </div>
-
-                {form.watch("tone") && (
-                  <div className="mt-6 space-y-2 rounded-md bg-neutral-900 p-4 ring-1 ring-neutral-500/50">
-                    <p className="text-neutral-400">Selected Tone</p>
-                    <p className="font-semibold">
-                      {(() => {
-                        const selectedTone = toneOptions.find(
-                          (option) => option.value === form.watch("tone"),
-                        );
-
-                        if (selectedTone) {
-                          const IconComponent = selectedTone.icon;
-                          return (
-                            <>
-                              <IconComponent
-                                className={`${selectedTone.color} mr-2 inline size-4`}
-                              />
-                              {selectedTone.label}
-                            </>
-                          );
-                        }
-                        return "No tone selected";
-                      })()}
-                    </p>
-                  </div>
-                )}
-                {form.watch("platforms").length > 0 && (
-                  <div className="mt-6 space-y-2 rounded-md bg-neutral-900 p-4 ring-1 ring-neutral-500/50">
-                    <p className="text-neutral-400">Selected Platform(s)</p>
-                    <p className="font-semibold">
-                      {form.watch("platforms").map((platform) => (
-                        <Badge
-                          key={platform}
-                          variant="outline"
-                          className="mr-2 bg-pink-600 text-white"
-                        >
-                          {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                        </Badge>
-                      ))}
-                    </p>
-                  </div>
-                )}
-                {form.watch("content") && (
-                  <div className="mt-6 space-y-2 rounded-md bg-neutral-900 p-4 ring-1 ring-neutral-500/50">
-                    <p className="text-neutral-400">Content Analysis</p>
-                    <p className="font-semibold">
-                      {form.watch("content").length} characters
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+          <div className="sticky top-6 self-start">
+            <PreviewCard
+              form={form}
+              onGenerate={form.handleSubmit(onSubmit)}
+              isGenerating={mutation.isPending}
+              isFormValid={
+                !!form.watch("content").trim() &&
+                !!form.watch("tone") &&
+                !!form.watch("posterType") &&
+                !!form.watch("audience") &&
+                form.watch("platforms").length > 0
+              }
+            />
+            {/* Generate Button */}
+            <Button
+              onClick={form.handleSubmit(onSubmit)}
+              disabled={
+                !form.watch("content").trim() ||
+                !form.watch("tone") ||
+                !form.watch("posterType") ||
+                !form.watch("audience") ||
+                form.watch("platforms").length === 0
+              }
+              className="mt-4 w-full"
+            >
+              <Sparkle className="size-4" />
+              {mutation.isPending ? "Generating..." : "Generate"}
+            </Button>
           </div>
         </div>
       </div>

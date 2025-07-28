@@ -17,15 +17,20 @@ export const appRouter = router({
       z.object({
         content: z.string(),
         tone: z.string(),
+        poster: z.string(),
+        audience: z.string(),
         platforms: z.array(z.string()),
         callToAction: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
-      const { content, tone, platforms, callToAction } = input;
+      const { content, tone, platforms, callToAction, poster, audience } =
+        input;
       const posts = await generatePosts({
         content,
         tone,
+        poster,
+        audience,
         platforms,
         callToAction,
       });
