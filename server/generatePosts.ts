@@ -27,6 +27,7 @@ export async function generatePosts({
   callToAction,
 }: Input): Promise<GeneratedPosts> {
   const result: GeneratedPosts = {};
+  console.log("Generating posts for:", platforms);
 
   // Generate content for each requested platform
   if (platforms.includes("linkedin")) {
@@ -39,7 +40,7 @@ export async function generatePosts({
     });
   }
 
-  if (platforms.includes("twitter")) {
+  if (platforms.includes("x")) {
     result.twitter = await generateTwitterThread({
       content,
       tone,
