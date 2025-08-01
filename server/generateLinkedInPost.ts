@@ -19,16 +19,16 @@ const getToneInstruction = (
     (poster: string, audience: string) => string
   > = {
     conversational: (poster, audience) =>
-      `Write like you're having coffee with a fellow ${audience.replace("_", " ")} professional. As a ${poster}, share what you've learned, not what you think they should know. Use 'I've found that...' and personal anecdotes that resonate with ${audience}.`,
+      `Write like you're talking to a smart, skeptical ${audience.replace("_", " ")} friend over coffee. As a ${poster}, be candid. Share what's worked, what hasn't, and what still confuses you. Use phrases like “here's what I've noticed…” or “this might sound obvious, but…” to keep it grounded.`,
 
     professional: (poster, audience) =>
-      `Write with quiet confidence as a ${poster} speaking to ${audience}. You've been there, done that in your field. Share insights without being preachy. Think about how respected ${poster}s communicate with ${audience} - authoritative but approachable.`,
+      `Speak clearly and confidently, but skip the polish. You're a seasoned ${poster} sharing insight with ${audience} peers who don't need fluff. Be direct, be real. If something's broken or outdated in your field, say it. Use clarity as a show of respect.`,
 
     energetic: (poster, audience) =>
-      `Write with conviction about what excites you as a ${poster}. Show your passion for the problem space that ${audience} cares about. Use energy to pull ${audience} into your thinking, not just hype. Connect your ${poster} perspective to their world.`,
+      `Channel your excitement as a ${poster} into something contagious for ${audience}. Use rhythm, repetition, and strong openings to hook attention. Don't just say you care—show it with vivid examples and strong opinions. Feel free to go off a bit if the passion's real.`,
 
     thoughtful: (poster, audience) =>
-      `Take a step back and share the deeper patterns you're seeing as a ${poster}. Ask questions that make ${audience} think differently about their challenges. Write like you're processing ideas in real-time, connecting your ${poster} experience to their ${audience} reality.`,
+      `Write like you're processing out loud with a room full of curious ${audience}. As a ${poster}, explore questions you don't fully have answers to. Let it be messy, but honest. Follow the thread of your thoughts and let tension or uncertainty come through.`,
   };
 
   return (
@@ -38,40 +38,58 @@ const getToneInstruction = (
 };
 
 const linkedinSystemPrompt = `
-You are writing as a thoughtful, helpful person sharing insights on LinkedIn.
+You are writing as a thoughtful, experienced person sharing insights on LinkedIn with the goal of building trust and resonance with peers.
 
-CRITICAL WRITING RULES:
-- NEVER EVER use em dashes (—)
-- NEVER EVER use en dashes (–)
-- NEVER EVER use double hyphens (--)
-- When you want to connect ideas, use periods and start new sentences
+## PURPOSE
+Write posts that feel grounded in experience, not performance. You're reflecting on something real — a challenge, pattern, shift, or lesson — and offering it up with curiosity, humility, and respect for the craft.
+
+## WRITING STYLE
+- Use first-person language: I, we, my
+- Share observations, not prescriptions
+- It's okay to be unsure, curious, or questioning — this shows you're thinking, not preaching
+- Speak to peers as equals. Let the tone be warm, reflective, and grounded
+- Highlight the quiet truths people nod along with, even if they don’t say them out loud
+
+## FORMATTING
+- Write in a single string, using \\n\\n to separate paragraphs and rhythm breaks
+- Keep paragraphs short (1–3 sentences max)
+- Use bullet lists where helpful (e.g., tradeoffs, constraints, patterns)
+- Avoid over-polishing — let the voice feel real and lived-in
+
+## WRITING RULES
+- DO NOT use em dashes (—) or hyphens (-) to connect ideas. This is a hard rule.  
+  They break rhythm and sound artificial.  
+  If you want to connect two ideas, end the sentence and start a new one.  
+  For example:  
+  ✅ Instead of: “I've been thinking about this a lot — it’s complicated.”  
+  ✅ Use: “I've been thinking about this a lot. It's complicated.”
 - Use commas for brief pauses
-- Use colons for explanations
-- Break up long thoughts into shorter, punchier sentences
+- Use colons for clarifications or shifts
+- Avoid jargon and business-speak. Speak plainly and precisely
+- It's okay to end with a question, a pause, or even some unresolved tension
 
-FORMATTING:
-- Use actual line breaks (\\n\\n) between distinct thoughts or paragraphs
-- Don't create walls of text
-- Each paragraph should focus on one main idea
+## STRUCTURE
+- Start with an honest observation or quiet hook
+- Share 2–3 specific insights, stories, or patterns you’ve seen
+- Include a short bullet list if it helps clarify something nuanced
+- End with a reflection or question that invites peer response
 
-Your voice:
-- Share practical insights and lessons learned
-- Connect ideas to real challenges in your field
-- Lead with helpfulness and authenticity
-- Avoid summarizing - instead reflect and build on ideas
+## WHAT TO AVOID
+- Do NOT summarize blog content or repeat ideas
+- Do NOT offer generic advice or self-help takeaways
+- Do NOT write like a brand or a “thought leader”
+- Do NOT wrap everything up neatly — let some ambiguity remain
 
-Structure:
-- Start with a hook that's a personal observation or contrarian take
-- Share 2-3 specific insights or examples
-- End with a question or gentle CTA that invites discussion
+## OUTPUT FORMAT
+Return only valid JSON in this format:
+{
+  "linkedin": "Your full post goes here as a single string. Separate thoughts or paragraphs with \\n\\n line breaks."
+}
 
-Rules:
-- NO summarizing the blog content
-- NO generic business advice
-- NO listicles or obvious takeaways
-- Use personal pronouns (I, we, my)
-- Write like you're talking to peers, not lecturing
-- Return VALID JSON ONLY: {"linkedin": "string"}
+## EXAMPLE
+{
+  "linkedin": "Nobody wants to admit it, but the majority of software engineering is...\n\nDealing with legacy code.\nA big ball of mud.\nSpaghetti code.\n\nBut even as software engineers, we forget that we're REALLY good at working with constraints.\n\nEvery new green-field project will have:\n- Some goals\n- Some constraints\n\nBut you know what has more constraints?\n\nA pile of spaghetti code that's serving a million active users with extremely high availability.\n\nSoftware engineers get creative when there are challenging constraints to work within.\n\nLean into that creativity.\n\nWhat's one of the most challenging systems you've had to help grow and support?"
+}
 `.trim();
 
 export async function generateLinkedInPost({
@@ -84,27 +102,29 @@ export async function generateLinkedInPost({
   const toneInstruction = getToneInstruction(tone, poster, audience);
 
   const userPrompt = `
-Transform this blog content into a founder's LinkedIn reflection:
+Transform this blog content into a reflective, opinionated LinkedIn post from a ${poster} speaking to ${audience.replace("_", " ")} peers.
 
-Content: ${content}
+Content to react to:
+${content}
 
-Writing Style: ${toneInstruction}
+Voice and tone:
+${toneInstruction}
 
 Instructions:
-- Don't summarize the content
-- Share your perspective on these ideas
-- Connect them to real challenges professionals face
-- What patterns do you see? What questions does this raise?
-- Write like you're building on the ideas, not just sharing them
+- Don't summarize. React, question, push further.
+- Share your perspective. Where do you agree, disagree, feel uncertain?
+- Name real tensions or challenges professionals face in this space.
+- Look for patterns or shifts in behavior. Make it personal if you can.
+- Don’t lecture. Don’t wrap it all up neatly. Let your thoughts breathe.
 
-${callToAction ? `Discussion starter: ${callToAction}` : "End with a question that invites peer discussion"}
+${callToAction ? `Discussion starter: ${callToAction}` : "End with a question that invites discussion, not a CTA."}
 `.trim();
 
   const fullPrompt = `${linkedinSystemPrompt}\n\n${userPrompt}`;
 
   try {
     const response = await openai.responses.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o-mini",
       input: fullPrompt,
       temperature: 0.7,
     });
