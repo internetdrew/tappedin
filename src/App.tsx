@@ -17,40 +17,37 @@ import type { inferProcedureOutput } from "@trpc/server";
 const formSchema = z.object({
   content: z.string().min(1, "Content is required"),
   tone: z.string().min(1, "Please select a tone"),
-  platforms: z.array(z.string()).min(1, "Please select at least one platform"),
   posterType: z.string().min(1, "Please select a poster type"),
   audience: z.string().min(1, "Please select an audience"),
   callToAction: z.string().optional(),
 });
 
 export type FormData = z.infer<typeof formSchema>;
-export type GeneratePostsOutput = inferProcedureOutput<
-  AppRouter["generatePosts"]
+export type GeneratePostOutput = inferProcedureOutput<
+  AppRouter["generatePost"]
 >;
 
 function App() {
-  const [results, setResults] = useState<GeneratePostsOutput | null>(null);
+  const [results, setResults] = useState<GeneratePostOutput | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       content: "",
       tone: "",
-      platforms: [],
       posterType: "",
       audience: "",
       callToAction: "",
     },
   });
 
-  const mutation = useMutation(trpc.generatePosts.mutationOptions());
+  const mutation = useMutation(trpc.generatePost.mutationOptions());
 
   const onSubmit = async (data: FormData) => {
     await mutation.mutateAsync(
       {
         content: data.content,
         tone: data.tone,
-        platforms: data.platforms,
         poster: data.posterType,
         audience: data.audience,
         callToAction: data.callToAction || "",
@@ -85,8 +82,7 @@ function App() {
                   !!form.watch("content").trim() &&
                   !!form.watch("tone") &&
                   !!form.watch("posterType") &&
-                  !!form.watch("audience") &&
-                  form.watch("platforms").length > 0
+                  !!form.watch("audience")
                 }
               />
               <Button
@@ -95,8 +91,7 @@ function App() {
                   !form.watch("content").trim() ||
                   !form.watch("tone") ||
                   !form.watch("posterType") ||
-                  !form.watch("audience") ||
-                  form.watch("platforms").length === 0
+                  !form.watch("audience")
                 }
                 className="mt-4 w-full"
               >

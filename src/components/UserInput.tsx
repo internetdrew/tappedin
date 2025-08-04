@@ -10,7 +10,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,7 +22,6 @@ import {
 import { audienceOptions, posterTypeOptions, toneOptions } from "@/constants";
 import {
   AudioLines,
-  LayoutGrid,
   RocketIcon,
   ScrollTextIcon,
   Users,
@@ -226,79 +224,6 @@ const UserInput = ({ form, onSubmit }: UserInputProps) => {
                       ))}
                     </RadioGroup>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-        {/* Platforms */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <LayoutGrid className="mr-1 inline size-4 text-pink-600" />
-              Platforms
-            </CardTitle>
-            <CardDescription>
-              Select the platforms you want to post to.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <FormField
-              control={form.control}
-              name="platforms"
-              render={() => (
-                <FormItem>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 rounded-md p-4 ring-1 ring-neutral-500/50">
-                      <FormControl>
-                        <Checkbox
-                          id="linkedin"
-                          checked={form.watch("platforms").includes("linkedin")}
-                          onCheckedChange={(checked) => {
-                            const currentPlatforms = form.watch("platforms");
-                            if (checked) {
-                              form.setValue("platforms", [
-                                ...currentPlatforms,
-                                "linkedin",
-                              ]);
-                            } else {
-                              form.setValue(
-                                "platforms",
-                                currentPlatforms.filter(
-                                  (p) => p !== "linkedin",
-                                ),
-                              );
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <Label htmlFor="linkedin">LinkedIn</Label>
-                    </div>
-                    <div className="flex items-center gap-3 rounded-md p-4 ring-1 ring-neutral-500/50">
-                      <FormControl>
-                        <Checkbox
-                          id="x"
-                          checked={form.watch("platforms").includes("x")}
-                          onCheckedChange={(checked) => {
-                            const currentPlatforms = form.watch("platforms");
-                            if (checked) {
-                              form.setValue("platforms", [
-                                ...currentPlatforms,
-                                "x",
-                              ]);
-                            } else {
-                              form.setValue(
-                                "platforms",
-                                currentPlatforms.filter((p) => p !== "x"),
-                              );
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <Label htmlFor="x">X (Formerly Twitter)</Label>
-                    </div>
-                  </div>
                   <FormMessage />
                 </FormItem>
               )}

@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Badge } from "./ui/badge";
 import { audienceOptions, posterTypeOptions, toneOptions } from "../constants";
 import type { UseFormReturn } from "react-hook-form";
 import type { FormData } from "../App";
@@ -22,7 +21,6 @@ const PreviewCard = ({ form }: PreviewCardProps) => {
   const tone = form.watch("tone");
   const posterType = form.watch("posterType");
   const audience = form.watch("audience");
-  const platforms = form.watch("platforms");
 
   return (
     <Card>
@@ -83,20 +81,6 @@ const PreviewCard = ({ form }: PreviewCardProps) => {
               className={`${audience ? "text-pink-600" : "text-neutral-600"}`}
             >
               Audience selected
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-block h-2 w-2 rounded-full ${
-                platforms.length > 0 ? "bg-pink-600" : "bg-neutral-600"
-              }`}
-            ></span>
-            <span
-              className={`${
-                platforms.length > 0 ? "text-pink-600" : "text-neutral-600"
-              }`}
-            >
-              Platform(s) chosen
             </span>
           </div>
         </div>
@@ -173,22 +157,6 @@ const PreviewCard = ({ form }: PreviewCardProps) => {
                 }
                 return "No audience selected";
               })()}
-            </p>
-          </div>
-        )}
-        {platforms.length > 0 && (
-          <div className="space-y-2 rounded-md bg-neutral-900 p-4 ring-1 ring-neutral-500/50">
-            <p className="text-neutral-400">Selected Platform(s)</p>
-            <p className="font-semibold">
-              {platforms.map((platform) => (
-                <Badge
-                  key={platform}
-                  variant="outline"
-                  className="mr-2 bg-pink-600 text-white"
-                >
-                  {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                </Badge>
-              ))}
             </p>
           </div>
         )}

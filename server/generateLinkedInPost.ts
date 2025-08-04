@@ -11,7 +11,7 @@ type Input = {
 
 const getToneInstruction = (tone: string): string => {
   const toneTemplates: Record<string, string> = {
-    conversational: `Keep it grounded and human — like you're talking to a peer, not writing for approval. Let your voice show up.`,
+    conversational: `Keep it grounded and human, like you're talking to a peer, not writing for approval. Let your voice show up.`,
     professional: `You're experienced. You're writing for people who are too. Keep it clear, reflective, and rooted in actual work.`,
     energetic: `You're excited. Not hyped, but lit up by something real. Let that pulse show up in the rhythm or phrasing.`,
     thoughtful: `Be spacious. Let the post breathe. You're reflecting on something you're still unpacking. Invite others into that process.`,
@@ -24,10 +24,10 @@ const linkedinSystemPrompt = `
 You're writing a LinkedIn post for a thoughtful professional.
 
 ## GOAL
-Reflect on a real experience, tension, or pattern. The post should feel honest, personal, and rooted in actual work — not polished for performance.
+Reflect on a real experience, tension, or pattern. The post should feel honest, personal, and rooted in actual work, not polished for performance.
 
 ## VOICE
-- First-person (I, we, my)
+- First-person (I, we, my, etc.)
 - Natural, like you're talking to peers
 - Reflective, not prescriptive
 - It's okay to end unresolved
@@ -37,7 +37,8 @@ Reflect on a real experience, tension, or pattern. The post should feel honest, 
 - Short paragraphs (1–3 sentences)
 - Vary rhythm and structure
 - Lists are welcome if they feel natural
-- Skip intros and conclusions — start with the tension, end with a thought
+- Skip intros and conclusions, start with the tension, end with a thought
+- Do not use hyphens or dashes to connect ideas, thoughts, or sentences
 
 ## EXAMPLE
 Here's a post that captures the right feeling and structure:
@@ -48,11 +49,11 @@ Not because they’re bad at it — but because every draft feels like a perform
 
 Writing to please a stakeholder. Writing to sound strategic. Writing like a LinkedIn version of themselves.
 
-The irony is: the best content I’ve seen usually comes from a place of *frustration*. Or confusion. Or curiosity.
+The irony is that the best content I’ve seen usually comes from a place of frustration. Or confusion. Or curiosity.
 
 Real voice leaks through the cracks when the performance breaks.
 
-So the next time you write: skip the clever framing. Just say the thing."
+So the next time you write, skip the clever framing. Just say the thing."
 
 ## OUTPUT
 Return only this:
@@ -71,7 +72,7 @@ export async function generateLinkedInPost({
   const toneInstruction = getToneInstruction(tone);
 
   const userPrompt = `
-Write a LinkedIn post based on the following idea. Don’t summarize it — respond like someone thinking out loud about it:
+Write a LinkedIn post based on the following idea. Don’t summarize it, but respond like someone thinking out loud about it:
 
 ---
 ${content}
@@ -90,7 +91,7 @@ ${
 
   try {
     const response = await openai.responses.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       input: [
         {
           role: "system",
