@@ -7,12 +7,19 @@ import PostBody from "./PostBody";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import PostSkeleton from "./PostSkeleton";
 
-const Results = ({ results }: { results: GeneratePostOutput }) => {
+const Results = ({
+  results,
+  isGenerating,
+}: {
+  results: GeneratePostOutput | null;
+  isGenerating: boolean;
+}) => {
   const [copied, setCopied] = useState(false);
 
-  if (!results) {
-    return <div>Yikes! I think something went wrong.</div>;
+  if (isGenerating || !results) {
+    return <PostSkeleton />;
   }
 
   const handleCopy = async () => {
