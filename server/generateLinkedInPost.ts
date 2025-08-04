@@ -9,69 +9,57 @@ type Input = {
   callToAction?: string;
 };
 
-const getToneInstruction = (
-  tone: string,
-  poster: string,
-  audience: string,
-): string => {
-  const toneTemplates: Record<
-    string,
-    (poster: string, audience: string) => string
-  > = {
-    conversational: (poster, audience) =>
-      `Write like you're having coffee with a fellow ${audience.replace("_", " ")} professional. As a ${poster}, share what you've learned, not what you think they should know. Use 'I've found that...' and personal anecdotes that resonate with ${audience}.`,
-
-    professional: (poster, audience) =>
-      `Write with quiet confidence as a ${poster} speaking to ${audience}. You've been there, done that in your field. Share insights without being preachy. Think about how respected ${poster}s communicate with ${audience} - authoritative but approachable.`,
-
-    energetic: (poster, audience) =>
-      `Write with conviction about what excites you as a ${poster}. Show your passion for the problem space that ${audience} cares about. Use energy to pull ${audience} into your thinking, not just hype. Connect your ${poster} perspective to their world.`,
-
-    thoughtful: (poster, audience) =>
-      `Take a step back and share the deeper patterns you're seeing as a ${poster}. Ask questions that make ${audience} think differently about their challenges. Write like you're processing ideas in real-time, connecting your ${poster} experience to their ${audience} reality.`,
+const getToneInstruction = (tone: string): string => {
+  const toneTemplates: Record<string, string> = {
+    conversational: `Keep it grounded and human, like you're talking to a peer, not writing for approval. Let your voice show up.`,
+    professional: `You're experienced. You're writing for people who are too. Keep it clear, reflective, and rooted in actual work.`,
+    energetic: `You're excited. Not hyped, but lit up by something real. Let that pulse show up in the rhythm or phrasing.`,
+    thoughtful: `Be spacious. Let the post breathe. You're reflecting on something you're still unpacking. Invite others into that process.`,
   };
 
-  return (
-    toneTemplates[tone]?.(poster, audience) ||
-    toneTemplates.professional(poster, audience)
-  );
+  return toneTemplates[tone] || toneTemplates.professional;
 };
 
 const linkedinSystemPrompt = `
-You are writing as a thoughtful, helpful person sharing insights on LinkedIn.
+You're writing a LinkedIn post for a thoughtful professional.
 
-CRITICAL WRITING RULES:
-- NEVER EVER use em dashes (—)
-- NEVER EVER use en dashes (–)
-- NEVER EVER use double hyphens (--)
-- When you want to connect ideas, use periods and start new sentences
-- Use commas for brief pauses
-- Use colons for explanations
-- Break up long thoughts into shorter, punchier sentences
+## GOAL
+Reflect on a real experience, tension, or pattern. The post should feel honest, personal, and rooted in actual work, not polished for performance.
 
-FORMATTING:
-- Use actual line breaks (\\n\\n) between distinct thoughts or paragraphs
-- Don't create walls of text
-- Each paragraph should focus on one main idea
+## VOICE
+- First-person (I, we, my, etc.)
+- Natural, like you're talking to peers
+- Reflective, not prescriptive
+- It's okay to end unresolved
+- Avoid content marketing tone or big advice
 
-Your voice:
-- Share practical insights and lessons learned
-- Connect ideas to real challenges in your field
-- Lead with helpfulness and authenticity
-- Avoid summarizing - instead reflect and build on ideas
+## STYLE
+- Short paragraphs (1–3 sentences)
+- Vary rhythm and structure
+- Lists are welcome if they feel natural
+- Skip intros and conclusions, start with the tension, end with a thought
+- Do not use hyphens or dashes to connect ideas, thoughts, or sentences
 
-Structure:
-- Start with a hook that's a personal observation or contrarian take
-- Share 2-3 specific insights or examples
-- End with a question or gentle CTA that invites discussion
+## EXAMPLE
+Here's a post that captures the right feeling and structure:
 
-Rules:
-- NO summarizing the blog content
-- NO generic business advice
-- NO listicles or obvious takeaways
-- Use personal pronouns (I, we, my)
-- Write like you're talking to peers, not lecturing
-- Return VALID JSON ONLY: {"linkedin": "string"}
+"I’ve worked with a lot of smart marketers who secretly hate writing.
+
+Not because they’re bad at it — but because every draft feels like a performance.
+
+Writing to please a stakeholder. Writing to sound strategic. Writing like a LinkedIn version of themselves.
+
+The irony is that the best content I’ve seen usually comes from a place of frustration. Or confusion. Or curiosity.
+
+Real voice leaks through the cracks when the performance breaks.
+
+So the next time you write, skip the clever framing. Just say the thing."
+
+## OUTPUT
+Return only this:
+{
+  "linkedin": "Your post text here, using \\n\\n between paragraph breaks"
+}
 `.trim();
 
 export async function generateLinkedInPost({
@@ -81,32 +69,40 @@ export async function generateLinkedInPost({
   poster,
   audience,
 }: Input): Promise<string> {
-  const toneInstruction = getToneInstruction(tone, poster, audience);
+  const toneInstruction = getToneInstruction(tone);
 
   const userPrompt = `
-Transform this blog content into a founder's LinkedIn reflection:
+Write a LinkedIn post based on the following idea. Don’t summarize it, but respond like someone thinking out loud about it:
 
-Content: ${content}
+---
+${content}
+---
 
-Writing Style: ${toneInstruction}
+Tone: ${toneInstruction}
 
-Instructions:
-- Don't summarize the content
-- Share your perspective on these ideas
-- Connect them to real challenges professionals face
-- What patterns do you see? What questions does this raise?
-- Write like you're building on the ideas, not just sharing them
+The post should sound like it's coming from a ${poster}, speaking to ${audience.replace("_", " ")} peers.
 
-${callToAction ? `Discussion starter: ${callToAction}` : "End with a question that invites peer discussion"}
+${
+  callToAction
+    ? `Close with this prompt: ${callToAction}`
+    : "You can end with a quiet question or reflection — no need for a CTA."
+}
 `.trim();
-
-  const fullPrompt = `${linkedinSystemPrompt}\n\n${userPrompt}`;
 
   try {
     const response = await openai.responses.create({
-      model: "gpt-4.1-mini",
-      input: fullPrompt,
-      temperature: 0.7,
+      model: "gpt-4o-mini",
+      input: [
+        {
+          role: "system",
+          content: linkedinSystemPrompt,
+        },
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+      temperature: 0.8,
     });
 
     const raw = response.output_text.trim();

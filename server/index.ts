@@ -7,40 +7,31 @@ import dotenv from "dotenv";
 import path from "path";
 import compression from "compression";
 import helmet from "helmet";
-import { generatePosts } from "./generatePosts";
+import { generateLinkedInPost } from "./generateLinkedInPost";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 export const appRouter = router({
-  generatePosts: publicProcedure
+  generatePost: publicProcedure
     .input(
       z.object({
         content: z.string(),
         tone: z.string(),
         poster: z.string(),
         audience: z.string(),
-        platforms: z.array(z.string()),
         callToAction: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
-      const { content, tone, platforms, callToAction, poster, audience } =
-        input;
-      const posts = await generatePosts({
-        content,
-        tone,
+      const { content, tone, callToAction, poster, audience } = input;
+      const linkedInPost = await generateLinkedInPost({
         poster,
         audience,
-        platforms,
+        content,
+        tone,
         callToAction,
       });
-      return posts;
-    }),
-  greeting: publicProcedure
-    .input(z.object({ intro: z.string() }))
-    .query((opts) => {
-      const { input } = opts;
-      return `${input.intro} LyteStack` as const;
+      return linkedInPost;
     }),
 });
 
