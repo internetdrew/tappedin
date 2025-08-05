@@ -60,8 +60,7 @@ const UserInput = ({ form, onSubmit }: UserInputProps) => {
                 <FormItem>
                   <FormControl>
                     <Textarea
-                      placeholder="Paste your content here and we'll generate a social media post
-                            for you."
+                      placeholder="Paste your blog post here to get started..."
                       className="h-44 resize-none"
                       {...field}
                     />
