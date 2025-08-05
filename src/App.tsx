@@ -7,7 +7,7 @@ import { trpc } from "../utils/trpc";
 import { useMutation } from "@tanstack/react-query";
 import PreviewCard from "./components/PreviewCard";
 import { Button } from "./components/ui/button";
-import SiteHeader from "./components/SiteHeader";
+import Navbar from "./components/Navbar";
 import UserInput from "./components/UserInput";
 import { useState } from "react";
 import Results from "./components/Results";
@@ -66,10 +66,10 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <Navbar renderStartOver={!!results} setResults={setResults} />
       <div className="mx-auto max-w-screen-xl px-4 sm:px-0">
-        <SiteHeader />
-        {results ? (
-          <Results results={results} />
+        {mutation.isPending || results ? (
+          <Results results={results} isGenerating={mutation.isPending} />
         ) : (
           <div className="my-10 grid grid-cols-1 gap-10 sm:grid-cols-2">
             <UserInput form={form} onSubmit={onSubmit} />
@@ -91,7 +91,8 @@ function App() {
                   !form.watch("content").trim() ||
                   !form.watch("tone") ||
                   !form.watch("posterType") ||
-                  !form.watch("audience")
+                  !form.watch("audience") ||
+                  mutation.isPending
                 }
                 className="mt-4 w-full"
               >
