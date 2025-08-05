@@ -66,21 +66,21 @@ const Results = ({
               {copied ? (
                 <span className="text-sm font-medium">Copied</span>
               ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleCopy}
-                  className="transition-all duration-200"
-                >
-                  <Tooltip>
-                    <TooltipTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCopy}
+                      className="transition-all duration-200"
+                    >
                       <Copy className="h-4 w-4" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Copy to clipboard</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </Button>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Copy to clipboard</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </CardAction>
           </div>
