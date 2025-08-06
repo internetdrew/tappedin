@@ -16,6 +16,7 @@ import type { inferProcedureOutput } from "@trpc/server";
 import { Card, CardTitle, CardHeader, CardContent } from "./components/ui/card";
 import { TRPCClientError } from "@trpc/client";
 import FeedbackForm from "./components/FeedbackForm";
+import Footer from "./components/Footer";
 
 const formSchema = z.object({
   content: z
@@ -136,6 +137,7 @@ function App() {
           </>
         )}
       </div>
+      <Footer />
     </ThemeProvider>
   );
 }
