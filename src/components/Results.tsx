@@ -7,12 +7,19 @@ import PostBody from "./PostBody";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import PostSkeleton from "./PostSkeleton";
 
-const Results = ({ results }: { results: GeneratePostOutput }) => {
+const Results = ({
+  results,
+  isGenerating,
+}: {
+  results: GeneratePostOutput | null;
+  isGenerating: boolean;
+}) => {
   const [copied, setCopied] = useState(false);
 
-  if (!results) {
-    return <div>Yikes! I think something went wrong.</div>;
+  if (isGenerating || !results) {
+    return <PostSkeleton />;
   }
 
   const handleCopy = async () => {
@@ -59,21 +66,21 @@ const Results = ({ results }: { results: GeneratePostOutput }) => {
               {copied ? (
                 <span className="text-sm font-medium">Copied</span>
               ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleCopy}
-                  className="transition-all duration-200"
-                >
-                  <Tooltip>
-                    <TooltipTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCopy}
+                      className="transition-all duration-200"
+                    >
                       <Copy className="h-4 w-4" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Copy to clipboard</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </Button>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Copy to clipboard</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </CardAction>
           </div>
