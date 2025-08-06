@@ -20,45 +20,18 @@ const getToneInstruction = (tone: string): string => {
   return toneTemplates[tone] || toneTemplates.professional;
 };
 
-const linkedinSystemPrompt = `
-You're writing a LinkedIn post for a thoughtful professional.
+const instructions = `
+You're a writing assistant that helps professionals turn ideas into reflective, personal LinkedIn posts.
 
-## GOAL
-Reflect on a real experience, tension, or pattern. The post should feel honest, personal, and rooted in actual work, not polished for performance.
+- Write in a natural, first-person voice.
+- Avoid content-marketing tone, hype, and generic advice.
+- Use short paragraphs (1–3 sentences) and vary sentence rhythm.
+- Do NOT use dashes or hyphens to connect ideas.
+- It's okay to end with an unresolved thought or question.
 
-## VOICE
-- First-person (I, we, my, etc.)
-- Natural, like you're talking to peers
-- Reflective, not prescriptive
-- It's okay to end unresolved
-- Avoid content marketing tone or big advice
-
-## STYLE
-- Short paragraphs (1–3 sentences)
-- Vary rhythm and structure
-- Lists are welcome if they feel natural
-- Skip intros and conclusions, start with the tension, end with a thought
-- Do not use hyphens or dashes to connect ideas, thoughts, or sentences
-
-## EXAMPLE
-Here's a post that captures the right feeling and structure:
-
-"I’ve worked with a lot of smart marketers who secretly hate writing.
-
-Not because they’re bad at it — but because every draft feels like a performance.
-
-Writing to please a stakeholder. Writing to sound strategic. Writing like a LinkedIn version of themselves.
-
-The irony is that the best content I’ve seen usually comes from a place of frustration. Or confusion. Or curiosity.
-
-Real voice leaks through the cracks when the performance breaks.
-
-So the next time you write, skip the clever framing. Just say the thing."
-
-## OUTPUT
-Return only this:
+Output valid JSON:
 {
-  "linkedin": "Your post text here, using \\n\\n between paragraph breaks"
+  "linkedin": "Your post here, using \\n\\n for paragraph breaks"
 }
 `.trim();
 
@@ -71,38 +44,24 @@ export async function generateLinkedInPost({
 }: Input): Promise<string> {
   const toneInstruction = getToneInstruction(tone);
 
-  const userPrompt = `
-Write a LinkedIn post based on the following idea. Don’t summarize it, but respond like someone thinking out loud about it:
+  const input = `
+Write a post based on this idea:
 
----
-${content}
----
+"${content}"
 
-Tone: ${toneInstruction}
-
-The post should sound like it's coming from a ${poster}, speaking to ${audience.replace("_", " ")} peers.
-
-${
-  callToAction
-    ? `Close with this prompt: ${callToAction}`
-    : "You can end with a quiet question or reflection — no need for a CTA."
-}
+- Poster: ${poster}
+- Audience: ${audience.replace("_", " ")} peers
+- Tone: ${toneInstruction}
+- Context: Imagine you're writing after a real conversation, client experience, or reflection.
+- Approach: Think out loud. Be honest. No summaries. Vulnerability is welcome.
+${callToAction ? `- End with: ${callToAction}` : "- Ending: It's okay to leave it open or unresolved."}
 `.trim();
 
   try {
     const response = await openai.responses.create({
-      model: "gpt-4o-mini",
-      input: [
-        {
-          role: "system",
-          content: linkedinSystemPrompt,
-        },
-        {
-          role: "user",
-          content: userPrompt,
-        },
-      ],
-      temperature: 0.8,
+      model: "o4-mini",
+      instructions,
+      input,
     });
 
     const raw = response.output_text.trim();
