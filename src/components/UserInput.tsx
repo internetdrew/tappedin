@@ -48,8 +48,8 @@ const UserInput = ({ form, onSubmit }: UserInputProps) => {
               Content Input
             </CardTitle>
             <CardDescription>
-              You give me the content, I'll generate a social media post for
-              you.
+              Paste your blog post here to generate a social media post. Content
+              must be between 500 and 10,000 characters.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -62,10 +62,20 @@ const UserInput = ({ form, onSubmit }: UserInputProps) => {
                     <Textarea
                       placeholder="Paste your blog post here to get started..."
                       className="h-44 resize-none"
+                      maxLength={10000}
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <div className="text-muted-foreground flex justify-between text-sm">
+                    <FormMessage />
+                    <span
+                      className={
+                        field.value.length > 10000 ? "text-red-500" : ""
+                      }
+                    >
+                      {10000 - field.value.length} characters remaining
+                    </span>
+                  </div>
                 </FormItem>
               )}
             />
