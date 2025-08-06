@@ -12,13 +12,13 @@ import { Textarea } from "./ui/textarea";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import emailjs from "@emailjs/browser";
-import { useEffect } from "react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Please enter a valid email address"),
   feedback: z
     .string()
-    .min(1, "Feedback is required")
+    .min(1, "Please enter your feedback")
     .max(1000, "Feedback is too long"),
 });
 
@@ -33,16 +33,10 @@ const FeedbackForm = () => {
     },
   });
 
-  useEffect(() => {
-    if (form.formState.isSubmitSuccessful) {
-      form.reset();
-    }
-  }, [form.formState.isSubmitSuccessful, form]);
-
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     const { email, feedback } = data;
-    emailjs
-      .send(
+    try {
+      await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         {
@@ -52,15 +46,13 @@ const FeedbackForm = () => {
         {
           publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
         },
-      )
-      .then(
-        () => {
-          console.log("SUCCESS!");
-        },
-        (error) => {
-          console.log("FAILED...", error.text);
-        },
       );
+      toast.success("Feedback submitted successfully");
+      form.reset();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to submit feedback. Please try again.");
+    }
   };
 
   return (
@@ -97,14 +89,7 @@ const FeedbackForm = () => {
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          disabled={
-            form.formState.isSubmitting ||
-            !form.formState.isValid ||
-            !form.formState.isDirty
-          }
-        >
+        <Button type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Submitting..." : "Submit"}
         </Button>
       </form>
